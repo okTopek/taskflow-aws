@@ -2,7 +2,7 @@
 
 > System webowy do zarządzania zadaniami, wdrażany w chmurze publicznej **AWS** w izolowanej architekturze trójwarstwowej (3-tier).
 
-Projekt semestralny realizowany w ramach przedmiotu **Projekt zespołowy: Aplikacja w wybranej chmurze publicznej** Aplikacja jest rozwijana iteracyjnie, a każdy blok zajęć dodaje kolejny element, więc ten plik jest aktualizowany na bieżąco.
+Projekt semestralny realizowany w ramach przedmiotu **Projekt zespołowy: Aplikacja w wybranej chmurze publicznej**. Aplikacja jest rozwijana iteracyjnie, a każdy blok zajęć dodaje kolejny element, więc ten plik jest aktualizowany na bieżąco.
 
 ## Spis treści
 
@@ -58,26 +58,9 @@ Zakres jest planowany. Pozycje zostaną odhaczone w miarę postępu prac.
 
 ## Architektura
 
-Szkic koncepcyjny architektury trójwarstwowej w chmurze AWS:
+Schemat architektury trójwarstwowej w chmurze AWS (przepływ danych: Użytkownik → Web → API → Baza danych):
 
-```mermaid
-flowchart LR
-    U["Użytkownik"]
-    subgraph AWS["AWS Cloud · VPC"]
-        subgraph PUB["Podsieć publiczna · warstwa dostępowa"]
-            WEB["React + Nginx<br/>(EC2)"]
-        end
-        subgraph PRIVA["Podsieć prywatna A · warstwa logiki"]
-            API["Node.js + Express<br/>REST API (EC2)"]
-        end
-        subgraph PRIVB["Podsieć prywatna B · warstwa danych"]
-            DB[("PostgreSQL<br/>Amazon RDS")]
-        end
-    end
-    U -->|HTTPS| WEB
-    WEB -->|REST / JSON| API
-    API -->|SQL, port 5432| DB
-```
+![Schemat architektury 3-tier](docs/architektura-3tier.png)
 
 | Warstwa | Umiejscowienie | Zasada dostępu |
 |---|---|---|
@@ -109,24 +92,26 @@ Izolacja warstw zostanie zrealizowana przez podsieci w jednym VPC oraz reguły S
 
 ## Struktura repozytorium
 
-Planowany układ katalogów (na tę chwilę istnieje `docs/`, pozostałe powstaną w kolejnych blokach):
+Repozytorium ma osobne katalogi dla poszczególnych części projektu:
 
 ```text
 taskflow-aws/
-├── frontend/   # aplikacja React
-├── backend/    # API Node.js + Express
-├── infra/      # Terraform i konfiguracja infrastruktury AWS
-├── docs/       # dokumentacja, deklaracja projektu, diagramy
+├── frontend/   # aplikacja React (warstwa dostępowa)
+├── backend/    # API Node.js + Express (warstwa logiki)
+├── config/     # konfiguracja: przykładowe zmienne środowiskowe (.env.example)
+├── docs/       # dokumentacja, deklaracja projektu, schemat architektury
 └── README.md
 ```
 
-Konfiguracja aplikacji odbywa się przez zmienne środowiskowe. W repozytorium znajdzie się tylko plik `.env.example`, a prawdziwe dane (hasła, klucze, tokeny) nigdy nie trafią do kontroli wersji.
+Zasada projektu: w kodzie nie zapisujemy na stałe adresów URL ani danych dostępowych, a cała konfiguracja pochodzi ze zmiennych środowiskowych. W katalogu `config/` znajduje się tylko plik `.env.example` z nazwami zmiennych, a prawdziwe dane (hasła, klucze, tokeny) nigdy nie trafią do kontroli wersji.
 
 ## Uruchomienie lokalne
 
 *Sekcja w przygotowaniu. Zostanie uzupełniona po Blokach 5-6, gdy powstaną backend, baza danych i frontend.*
 
 Planowane wymagania: Git, Node.js (wersja LTS), Docker oraz Docker Compose.
+
+Konfiguracja: plik `config/.env.example` należy skopiować do `.env` i uzupełnić własnymi wartościami.
 
 ## Wdrożenie w chmurze
 
@@ -145,7 +130,7 @@ Zakres: sieć VPC z podsieciami, serwer Web (EC2), serwer API (EC2), baza Postgr
 | Blok | Zakres | Status |
 |---|---|---|
 | 1 | Start, deklaracja projektu, repozytorium, tablica zadań, szkic architektury | gotowy |
-| 2 | Tablica zadań, schemat 3-tier, konfiguracje lokalne, foldery w repo | zaplanowany |
+| 2 | Tablica zadań, schemat 3-tier, konfiguracje lokalne, foldery w repo | gotowy |
 | 3 | Konto AWS, sieć VPC i podsieci | zaplanowany |
 | 4 | Szkielet aplikacji: serwer aplikacji (prywatna) i warstwa Web (publiczna) | zaplanowany |
 | 5 | Backend, REST API i baza danych | zaplanowany |
