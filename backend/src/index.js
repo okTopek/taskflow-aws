@@ -1,8 +1,9 @@
 import express from 'express'
+import { config } from './config.js'
 import tasksRouter from './routes/tasks.js'
 
 const app = express()
-const port = process.env.PORT || 3000
+const port = config.port
 
 app.use(express.json())
 

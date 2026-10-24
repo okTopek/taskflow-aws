@@ -1,7 +1,7 @@
 node_modules
 npm-debug.log*
 
-# Zmienne środowiskowe (prawdziwy .env nigdy do repo)
+# Zmienne środowiskowe
 .env
 .env.*
 !.env.example
