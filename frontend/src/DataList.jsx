@@ -1,12 +1,5 @@
+import tasks from './data/tasks.json'
 import './DataList.css'
-
-const tasks = [
-  { id: 1, title: 'Założenie konta AWS', status: 'done', priority: 'high', dueDate: '2026-10-23' },
-  { id: 2, title: 'Projekt VPC i podsieci', status: 'done', priority: 'high', dueDate: '2026-10-24' },
-  { id: 3, title: 'Szkielet frontendu (React + Vite)', status: 'in_progress', priority: 'medium', dueDate: '2026-10-24' },
-  { id: 4, title: 'Dockerfile z Nginx dla frontendu', status: 'todo', priority: 'medium', dueDate: '2026-10-24' },
-  { id: 5, title: 'Backend REST API (Express)', status: 'todo', priority: 'high', dueDate: '2026-11-07' },
-]
 
 const STATUS_LABELS = {
   todo: 'Do zrobienia',
