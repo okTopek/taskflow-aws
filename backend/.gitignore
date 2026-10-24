@@ -1,0 +1,7 @@
+node_modules
+npm-debug.log*
+
+# Zmienne środowiskowe (prawdziwy .env nigdy do repo)
+.env
+.env.*
+!.env.example
