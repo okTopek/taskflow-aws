@@ -132,8 +132,8 @@ Zakres: sieć VPC z podsieciami, serwer Web (EC2), serwer API (EC2), baza Postgr
 | 1 | Start, deklaracja projektu, repozytorium, tablica zadań, szkic architektury | gotowy |
 | 2 | Tablica zadań, schemat 3-tier, konfiguracje lokalne, foldery w repo | gotowy |
 | 3 | Konto AWS, sieć VPC i podsieci | gotowy |
-| 4 | Szkielet aplikacji: serwer aplikacji (prywatna) i warstwa Web (publiczna) | zaplanowany |
-| 5 | Backend, REST API i baza danych | zaplanowany |
+| 4 | Szkielet aplikacji: serwer aplikacji (prywatna) i warstwa Web (publiczna) | gotowy |
+| 5 | Backend, REST API i baza danych | gotowy |
 | 6 | Funkcje biznesowe UI i integracja end-to-end | zaplanowany |
 | 7 | GitHub Actions, CI i skanowanie bezpieczeństwa | zaplanowany |
 | 8 | Automatyzacja deploymentu do chmury (CD) | zaplanowany |
