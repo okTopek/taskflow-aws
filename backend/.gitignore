@@ -1,0 +1,7 @@
+node_modules
+npm-debug.log*
+
+# Zmienne środowiskowe
+.env
+.env.*
+!.env.example
