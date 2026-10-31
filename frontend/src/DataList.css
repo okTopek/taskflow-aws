@@ -19,6 +19,35 @@
   font-weight: 500;
 }
 
+.task-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.task-form input,
+.task-form select,
+.task-form button,
+.actions button {
+  padding: 8px 12px;
+  font: inherit;
+  color: var(--text-h);
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.task-form input[name='title'] {
+  flex: 1;
+  min-width: 200px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
 .badge {
   display: inline-block;
   padding: 2px 10px;
