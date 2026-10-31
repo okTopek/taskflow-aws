@@ -1,12 +1,20 @@
 import { API_URL } from './config.js'
 
 async function request(path, options) {
-  const response = await fetch(`${API_URL}${path}`, {
-    headers: { 'Content-Type': 'application/json' },
-    ...options,
-  })
+  let response
+  try {
+    response = await fetch(`${API_URL}${path}`, {
+      headers: { 'Content-Type': 'application/json' },
+      ...options,
+    })
+  } catch {
+    throw new Error('Nie można połączyć się z serwerem')
+  }
+
   if (!response.ok) {
-    throw new Error(`Błąd ${response.status}`)
+    const body = await response.json().catch(() => null)
+    const details = body?.details ? `: ${body.details.join(', ')}` : ''
+    throw new Error(`${body?.error ?? `Błąd ${response.status}`}${details}`)
   }
   return response.status === 204 ? null : response.json()
 }

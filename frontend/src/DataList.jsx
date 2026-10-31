@@ -20,10 +20,34 @@ function DataList() {
   const [tasks, setTasks] = useState([])
   const [form, setForm] = useState(EMPTY_FORM)
   const [editingId, setEditingId] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState(null)
+  const [success, setSuccess] = useState(null)
 
   useEffect(() => {
-    getTasks().then(setTasks)
+    getTasks()
+      .then(setTasks)
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false))
   }, [])
+
+  const runAction = async (action, successMessage) => {
+    setError(null)
+    setSuccess(null)
+    setSubmitting(true)
+    try {
+      await action()
+      setTasks(await getTasks())
+      setSuccess(successMessage)
+      return true
+    } catch (err) {
+      setError(err.message)
+      return false
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
   const handleChange = (event) => {
     setForm({ ...form, [event.target.name]: event.target.value })
@@ -36,13 +60,11 @@ function DataList() {
 
   const handleSubmit = async (event) => {
     event.preventDefault()
-    if (editingId) {
-      await updateTask(editingId, form)
-    } else {
-      await createTask(form)
-    }
-    resetForm()
-    setTasks(await getTasks())
+    const ok = await runAction(
+      () => (editingId ? updateTask(editingId, form) : createTask(form)),
+      editingId ? 'Zadanie zostało zaktualizowane' : 'Zadanie zostało dodane',
+    )
+    if (ok) resetForm()
   }
 
   const handleEdit = (task) => {
@@ -55,10 +77,7 @@ function DataList() {
     })
   }
 
-  const handleDelete = async (id) => {
-    await deleteTask(id)
-    setTasks(await getTasks())
-  }
+  const handleDelete = (id) => runAction(() => deleteTask(id), 'Zadanie zostało usunięte')
 
   return (
     <section className="data-list">
@@ -77,14 +96,21 @@ function DataList() {
           ))}
         </select>
         <input name="dueDate" type="date" value={form.dueDate} onChange={handleChange} />
-        <button type="submit">{editingId ? 'Zapisz zmiany' : 'Dodaj zadanie'}</button>
+        <button type="submit" disabled={submitting}>
+          {submitting ? 'Zapisywanie…' : editingId ? 'Zapisz zmiany' : 'Dodaj zadanie'}
+        </button>
         {editingId && (
-          <button type="button" onClick={resetForm}>Anuluj</button>
+          <button type="button" onClick={resetForm} disabled={submitting}>Anuluj</button>
         )}
       </form>
 
-      {tasks.length === 0 ? (
-        <p>Brak zadań.</p>
+      {error && <p className="message message-error" role="alert">{error}</p>}
+      {success && <p className="message message-success" role="status">{success}</p>}
+
+      {loading ? (
+        <p className="message">Ładowanie zadań…</p>
+      ) : tasks.length === 0 ? (
+        !error && <p>Brak zadań.</p>
       ) : (
         <table>
           <thead>
@@ -108,8 +134,8 @@ function DataList() {
                 <td>{PRIORITY_LABELS[task.priority]}</td>
                 <td>{task.dueDate}</td>
                 <td className="actions">
-                  <button onClick={() => handleEdit(task)}>Edytuj</button>
-                  <button onClick={() => handleDelete(task.id)}>Usuń</button>
+                  <button onClick={() => handleEdit(task)} disabled={submitting}>Edytuj</button>
+                  <button onClick={() => handleDelete(task.id)} disabled={submitting}>Usuń</button>
                 </td>
               </tr>
             ))}

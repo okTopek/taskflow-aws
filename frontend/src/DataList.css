@@ -43,6 +43,29 @@
   min-width: 200px;
 }
 
+.message {
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  background: var(--code-bg);
+}
+
+.message-error {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.message-success {
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.12);
+}
+
+.task-form button:disabled,
+.actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .actions {
   display: flex;
   gap: 8px;
