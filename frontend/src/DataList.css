@@ -38,9 +38,24 @@
   border-radius: 6px;
 }
 
-.task-form input[name='title'] {
+.task-form .field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.task-form .field-title {
   flex: 1;
   min-width: 200px;
+}
+
+.task-form input[aria-invalid='true'] {
+  border-color: #ef4444;
+}
+
+.field-error {
+  color: #ef4444;
+  font-size: 14px;
 }
 
 .message {

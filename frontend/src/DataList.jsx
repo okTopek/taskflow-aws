@@ -16,9 +16,23 @@ const PRIORITY_LABELS = {
 
 const EMPTY_FORM = { title: '', status: 'todo', priority: 'medium', dueDate: '' }
 
+const validate = (values) => {
+  const errors = {}
+  if (!values.title.trim()) {
+    errors.title = 'Tytuł jest wymagany'
+  }
+  if (!values.dueDate) {
+    errors.dueDate = 'Termin jest wymagany'
+  } else if (Number.isNaN(Date.parse(values.dueDate))) {
+    errors.dueDate = 'Termin musi być poprawną datą'
+  }
+  return errors
+}
+
 function DataList() {
   const [tasks, setTasks] = useState([])
   const [form, setForm] = useState(EMPTY_FORM)
+  const [fieldErrors, setFieldErrors] = useState({})
   const [editingId, setEditingId] = useState(null)
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -50,16 +64,22 @@ function DataList() {
   }
 
   const handleChange = (event) => {
-    setForm({ ...form, [event.target.name]: event.target.value })
+    const { name, value } = event.target
+    setForm({ ...form, [name]: value })
+    setFieldErrors({ ...fieldErrors, [name]: undefined })
   }
 
   const resetForm = () => {
     setForm(EMPTY_FORM)
+    setFieldErrors({})
     setEditingId(null)
   }
 
   const handleSubmit = async (event) => {
     event.preventDefault()
+    const errors = validate(form)
+    setFieldErrors(errors)
+    if (Object.keys(errors).length > 0) return
     const ok = await runAction(
       () => (editingId ? updateTask(editingId, form) : createTask(form)),
       editingId ? 'Zadanie zostało zaktualizowane' : 'Zadanie zostało dodane',
@@ -83,8 +103,17 @@ function DataList() {
     <section className="data-list">
       <h1>Lista zadań</h1>
 
-      <form className="task-form" onSubmit={handleSubmit}>
-        <input name="title" placeholder="Tytuł" value={form.title} onChange={handleChange} />
+      <form className="task-form" onSubmit={handleSubmit} noValidate>
+        <div className="field field-title">
+          <input
+            name="title"
+            placeholder="Tytuł"
+            value={form.title}
+            onChange={handleChange}
+            aria-invalid={Boolean(fieldErrors.title)}
+          />
+          {fieldErrors.title && <span className="field-error">{fieldErrors.title}</span>}
+        </div>
         <select name="status" value={form.status} onChange={handleChange}>
           {Object.entries(STATUS_LABELS).map(([value, label]) => (
             <option key={value} value={value}>{label}</option>
@@ -95,7 +124,16 @@ function DataList() {
             <option key={value} value={value}>{label}</option>
           ))}
         </select>
-        <input name="dueDate" type="date" value={form.dueDate} onChange={handleChange} />
+        <div className="field">
+          <input
+            name="dueDate"
+            type="date"
+            value={form.dueDate}
+            onChange={handleChange}
+            aria-invalid={Boolean(fieldErrors.dueDate)}
+          />
+          {fieldErrors.dueDate && <span className="field-error">{fieldErrors.dueDate}</span>}
+        </div>
         <button type="submit" disabled={submitting}>
           {submitting ? 'Zapisywanie…' : editingId ? 'Zapisz zmiany' : 'Dodaj zadanie'}
         </button>
