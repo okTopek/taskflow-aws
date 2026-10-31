@@ -73,9 +73,9 @@ Przepływ danych w aplikacji (linia przerywana oznacza połączenie backendu z b
 
 ```mermaid
 flowchart LR
-    U[Przeglądarka użytkownika] -->|HTTP 80/443| W[Frontend React + Nginx<br/>podsieć publiczna]
-    W -->|REST API, JSON| A[Backend Node.js + Express<br/>podsieć prywatna A]
-    A -.->|SQL, port 5432| D[(PostgreSQL RDS<br/>podsieć prywatna B)]
+    U["Przeglądarka użytkownika"] -->|"HTTP"| W["Frontend React + Nginx<br/>podsieć publiczna"]
+    W -->|"REST API, JSON"| A["Backend Node.js + Express<br/>podsieć prywatna A"]
+    A -.->|"SQL, port 5432"| D["PostgreSQL RDS<br/>podsieć prywatna B"]
 ```
 
 Izolacja warstw jest zrealizowana przez podsieci w jednym VPC oraz reguły Security Groups (Web przyjmuje ruch z Internetu, App tylko z Web, baza tylko z App). Finalny diagram architektury powstanie w Bloku 13.
@@ -192,7 +192,7 @@ Zakres: sieć VPC z podsieciami, serwer Web (EC2), serwer API (EC2), baza Postgr
 | 3 | Konto AWS, sieć VPC i podsieci | gotowy |
 | 4 | Szkielet aplikacji: serwer aplikacji (prywatna) i warstwa Web (publiczna) | gotowy |
 | 5 | Backend, REST API i baza danych | gotowy |
-| 6 | Funkcje biznesowe UI i integracja end-to-end | zaplanowany |
+| 6 | Funkcje biznesowe UI i integracja end-to-end | gotowy |
 | 7 | GitHub Actions, CI i skanowanie bezpieczeństwa | zaplanowany |
 | 8 | Automatyzacja deploymentu do chmury (CD) | zaplanowany |
 | 9 | Bezpieczeństwo i hardening chmury | zaplanowany |
