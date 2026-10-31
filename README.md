@@ -14,9 +14,10 @@ Projekt semestralny realizowany w ramach przedmiotu **Projekt zespołowy: Aplika
 6. [Wzorce projektowe](#wzorce-projektowe)
 7. [Struktura repozytorium](#struktura-repozytorium)
 8. [Uruchomienie lokalne](#uruchomienie-lokalne)
-9. [Wdrożenie w chmurze](#wdrożenie-w-chmurze)
-10. [Organizacja pracy](#organizacja-pracy)
-11. [Harmonogram i status](#harmonogram-i-status)
+9. [API Endpoints](#api-endpoints)
+10. [Wdrożenie w chmurze](#wdrożenie-w-chmurze)
+11. [Organizacja pracy](#organizacja-pracy)
+12. [Harmonogram i status](#harmonogram-i-status)
 
 ## Opis projektu
 
@@ -68,7 +69,16 @@ Schemat architektury trójwarstwowej w chmurze AWS (przepływ danych: Użytkowni
 | Logiki (Backend API) | podsieć prywatna A | bez publicznego IP, ruch tylko z warstwy Web |
 | Danych (Database) | podsieć prywatna B | ruch tylko z warstwy aplikacji |
 
-Izolacja warstw zostanie zrealizowana przez podsieci w jednym VPC oraz reguły Security Groups. Szczegółowy schemat sieci powstanie w Bloku 3, a finalny diagram architektury w Bloku 13.
+Przepływ danych w aplikacji (linia przerywana oznacza połączenie backendu z bazą, które zostanie podpięte w kolejnych blokach; obecnie backend trzyma dane w pamięci):
+
+```mermaid
+flowchart LR
+    U[Przeglądarka użytkownika] -->|HTTP 80/443| W[Frontend React + Nginx<br/>podsieć publiczna]
+    W -->|REST API, JSON| A[Backend Node.js + Express<br/>podsieć prywatna A]
+    A -.->|SQL, port 5432| D[(PostgreSQL RDS<br/>podsieć prywatna B)]
+```
+
+Izolacja warstw jest zrealizowana przez podsieci w jednym VPC oraz reguły Security Groups (Web przyjmuje ruch z Internetu, App tylko z Web, baza tylko z App). Finalny diagram architektury powstanie w Bloku 13.
 
 ## Stos technologiczny
 
@@ -107,11 +117,59 @@ Zasada projektu: w kodzie nie zapisujemy na stałe adresów URL ani danych dost�
 
 ## Uruchomienie lokalne
 
-*Sekcja w przygotowaniu. Zostanie uzupełniona po Blokach 5-6, gdy powstaną backend, baza danych i frontend.*
+Wymagania: Git i Node.js 24 (LTS). Do uruchomienia frontendu w kontenerze potrzebny jest dodatkowo Docker.
 
-Planowane wymagania: Git, Node.js (wersja LTS), Docker oraz Docker Compose.
+**Backend** (API na porcie 3000):
 
-Konfiguracja: plik `config/.env.example` należy skopiować do `.env` i uzupełnić własnymi wartościami.
+1. Przejdź do katalogu backendu: `cd backend`
+2. Skopiuj szablon konfiguracji: `cp .env.example .env` (opcjonalnie, bez pliku serwer użyje domyślnego portu 3000)
+3. Zainstaluj zależności: `npm install`
+4. Uruchom serwer: `npm start` (tryb deweloperski z automatycznym restartem: `npm run dev`)
+
+Sprawdzenie działania: `http://localhost:3000/api/health` zwraca `{"status":"ok"}`. Dane zadań są na tym etapie przechowywane w pamięci serwera, więc po restarcie wracają do wartości początkowych.
+
+**Frontend** (aplikacja na porcie 5173):
+
+1. Przejdź do katalogu frontendu: `cd frontend`
+2. Utwórz lokalną konfigurację: `cp .env.example .env.local` i ustaw w niej adres API: `VITE_API_URL=http://localhost:3000/api`
+3. Zainstaluj zależności: `npm install`
+4. Uruchom aplikację: `npm run dev`, a następnie otwórz `http://localhost:5173`
+
+**Frontend w kontenerze** (Nginx na porcie 8080): `docker build -t taskflow-frontend frontend`, a następnie `docker run -p 8080:80 taskflow-frontend`.
+
+Zasada konfiguracji: prawdziwe pliki `.env` i `.env.local` nie trafiają do repozytorium (są w `.gitignore`), a w repozytorium są tylko szablony `.env.example` z placeholderami.
+
+## API Endpoints
+
+Adres bazowy: `http://localhost:3000`. Zasób zadań: `/api/tasks`. Obiekt zadania:
+
+```json
+{ "id": 1, "title": "Założenie konta AWS", "status": "done", "priority": "high", "dueDate": "2026-10-23" }
+```
+
+Dozwolone wartości: `status` to `todo`, `in_progress` lub `done`; `priority` to `low`, `medium` lub `high`; `dueDate` ma format `RRRR-MM-DD`.
+
+| Metoda | Endpoint | Opis | Body (JSON) | Kody odpowiedzi |
+|---|---|---|---|---|
+| GET | `/api/health` | Sprawdzenie działania serwera | brak | 200 |
+| GET | `/api/tasks` | Lista zadań | brak | 200 |
+| GET | `/api/tasks/:id` | Szczegóły zadania | brak | 200, 400, 404 |
+| POST | `/api/tasks` | Utworzenie zadania | wszystkie pola: `title`, `status`, `priority`, `dueDate` | 201, 400 |
+| PUT | `/api/tasks/:id` | Pełna aktualizacja zadania | wszystkie pola | 200, 400, 404 |
+| PATCH | `/api/tasks/:id` | Częściowa aktualizacja zadania | wybrane pola | 200, 400, 404 |
+| DELETE | `/api/tasks/:id` | Usunięcie zadania | brak | 204, 400, 404 |
+
+Przykład zapytania i odpowiedzi (`POST /api/tasks`, status 201):
+
+```json
+{ "title": "Nowe zadanie", "status": "todo", "priority": "low", "dueDate": "2026-11-01" }
+```
+
+```json
+{ "id": 4, "title": "Nowe zadanie", "status": "todo", "priority": "low", "dueDate": "2026-11-01" }
+```
+
+Błędy mają postać `{ "error": "..." }`. Przy niepoprawnych danych (400) odpowiedź zawiera dodatkowo listę `details` z opisem błędnych pól, a dla nieistniejącego zasobu (404) komunikat o braku zadania. Nieoczekiwane błędy serwera kończą się statusem 500.
 
 ## Wdrożenie w chmurze
 
