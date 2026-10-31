@@ -1,3 +1,4 @@
+import cors from 'cors'
 import express from 'express'
 import { config } from './config.js'
 import tasksRouter from './routes/tasks.js'
@@ -5,6 +6,7 @@ import tasksRouter from './routes/tasks.js'
 const app = express()
 const port = config.port
 
+app.use(cors())
 app.use(express.json())
 
 app.get('/api/health', (req, res) => {
