@@ -1,0 +1,17 @@
+name: CI & Security Scan
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build Frontend and Backend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
