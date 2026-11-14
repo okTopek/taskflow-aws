@@ -20,7 +20,7 @@ jobs:
       - name: Secret Scanning (TruffleHog)
         uses: trufflesecurity/trufflehog@v3.99.9
         with:
-          extra_args: --results=verified,unknown
+          extra_args: --results=verified,unknown,unverified
 
   vulnerability-scan:
     name: Vulnerability Scan (Trivy)
