@@ -194,7 +194,7 @@ Zakres: sieć VPC z podsieciami, serwer Web (EC2), serwer API (EC2), baza Postgr
 | 5 | Backend, REST API i baza danych | gotowy |
 | 6 | Funkcje biznesowe UI i integracja end-to-end | gotowy |
 | 7 | GitHub Actions, CI i skanowanie bezpieczeństwa | gotowy |
-| 8 | Automatyzacja deploymentu do chmury (CD) | zaplanowany |
+| 8 | Automatyzacja deploymentu do chmury (CD) | gotowy |
 | 9 | Bezpieczeństwo i hardening chmury | zaplanowany |
 | 10 | Optymalizacja kosztowa (FinOps) i monitoring | zaplanowany |
 | 11 | Testy integracyjne i automatyczne testy E2E | zaplanowany |
